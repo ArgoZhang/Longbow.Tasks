@@ -4,7 +4,7 @@ Longbow.Tasks 是一款对标 `QuartZ` 与 `Hangfire` 的定时任务组件
 ## 开发环境搭建
 1. 安装 .net core sdk 最新版 [官方网址](http://www.microsoft.com/net/download)
 2. 安装 Visual Studio 2019 最新版 [官方网址](https://visualstudio.microsoft.com/vs/getting-started/)
-3. 获取本项目代码 [BootstrapBlazor](https://gitee.com/LongbowEnterprise/Longbow.Tasks)
+3. 获取本项目代码 [Longbow.Tasks](https://gitee.com/LongbowEnterprise/Longbow.Tasks)
 
 
 ## QQ交流群
