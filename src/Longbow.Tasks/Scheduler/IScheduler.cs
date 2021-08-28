@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.Collections.Generic;
 
 namespace Longbow.Tasks

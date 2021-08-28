@@ -1,5 +1,8 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Longbow.Tasks
 {
@@ -11,10 +14,8 @@ namespace Longbow.Tasks
         /// <summary>
         /// 从持久化载体加载 ITrigger 触发器
         /// </summary>
-        /// <param name="schedulerName">任务调度器名称</param>
-        /// <param name="trigger"></param>
         /// <returns></returns>
-        bool Load(string schedulerName, ITrigger trigger);
+        Task LoadAsync();
 
         /// <summary>
         /// 将 ITrigger 触发器保存到序列化载体中

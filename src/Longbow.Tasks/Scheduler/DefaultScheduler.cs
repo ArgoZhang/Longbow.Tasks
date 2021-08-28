@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,15 +39,7 @@ namespace Longbow.Tasks
         /// <summary>
         /// 获得/设置 调度器相关触发器
         /// </summary>
-        public IEnumerable<ITrigger> Triggers
-        {
-            get => SchedulerProcess?.Triggers.Select(t => t.Trigger) ??
-#if NET45
-                    new DefaultTrigger[0];
-#else
-                    Array.Empty<DefaultTrigger>();
-#endif
-        }
+        public IEnumerable<ITrigger> Triggers => SchedulerProcess?.Triggers.Select(t => t.Trigger) ?? Array.Empty<DefaultTrigger>();
 
         /// <summary>
         /// 获得/设置 调度处理器实例

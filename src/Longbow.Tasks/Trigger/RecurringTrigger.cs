@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -52,8 +54,9 @@ namespace Longbow.Tasks
         public override Dictionary<string, object> SetData()
         {
             var data = base.SetData();
-            data.Add("CurrentCount", CurrentCount);
-            data.Add("RepeatCount", RepeatCount);
+            data.Add(nameof(CurrentCount), CurrentCount);
+            data.Add(nameof(RepeatCount), RepeatCount);
+            data.Add(nameof(Interval), Interval.TotalSeconds);
             return data;
         }
 
@@ -64,8 +67,9 @@ namespace Longbow.Tasks
         public override void LoadData(Dictionary<string, object> datas)
         {
             base.LoadData(datas);
-            if (int.TryParse(datas["CurrentCount"].ToString(), out var count)) CurrentCount = count;
-            if (int.TryParse(datas["RepeatCount"].ToString(), out var repeatCount)) RepeatCount = repeatCount;
+            if (int.TryParse(datas[nameof(CurrentCount)].ToString(), out var count)) CurrentCount = count;
+            if (int.TryParse(datas[nameof(RepeatCount)].ToString(), out var repeatCount)) RepeatCount = repeatCount;
+            if (double.TryParse(datas[nameof(Interval)].ToString(), out var interval)) Interval = TimeSpan.FromSeconds(interval);
         }
 
         /// <summary>

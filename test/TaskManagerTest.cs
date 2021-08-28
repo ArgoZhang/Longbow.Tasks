@@ -1,4 +1,6 @@
-﻿#if NETCOREAPP3_1
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+#if NETCOREAPP3_1
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,14 +8,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text;
 #endif
+using Longbow.Logging;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using Longbow.Logging;
-using System.Linq;
 using static Longbow.Tasks.TaskManagerTest;
 
 namespace Longbow.Tasks
@@ -584,7 +592,6 @@ namespace Longbow.Tasks
 
         public class Startup
         {
-#if NETCOREAPP3_1
             public Startup(IConfiguration configuration)
             {
                 Interlocked.Increment(ref InitCount);
@@ -613,13 +620,6 @@ namespace Longbow.Tasks
                 });
                 app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
             }
-#else
-            public Startup()
-            {
-                Interlocked.Increment(ref InitCount);
-                TaskServicesManager.Init(new LoggerProvider(Log).CreateLogger(nameof(TaskServicesManager)), new TaskServicesOptions());
-            }
-#endif
         }
     }
 }

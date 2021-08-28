@@ -1,4 +1,5 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
@@ -16,9 +17,9 @@ namespace Longbow.Tasks
         /// <param name="builder"></param>
         /// <param name="configure"></param>
         /// <returns></returns>
-        public static ITaskStorageBuilder AddFileStorage(this ITaskStorageBuilder builder, Action<FileStorageOptions>? configure = null)
+        public static ITaskStorageBuilder AddFileStorage<TStorage>(this ITaskStorageBuilder builder, Action<FileStorageOptions>? configure = null) where TStorage : FileStorage
         {
-            builder.Services.AddSingleton<IStorage, FileStorage>();
+            builder.Services.AddSingleton<IStorage, TStorage>();
             builder.Services.AddSingleton<IOptionsChangeTokenSource<FileStorageOptions>, ConfigurationChangeTokenSource<FileStorageOptions>>();
             builder.Services.AddSingleton<IConfigureOptions<FileStorageOptions>, FileStorageOptionsConfigureOptions<FileStorageOptions>>();
             if (configure != null) builder.Services.Configure(configure);
@@ -26,4 +27,3 @@ namespace Longbow.Tasks
         }
     }
 }
-#endif

@@ -1,21 +1,19 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.Extensions.Options;
-#endif
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Longbow.Tasks
 {
     /// <summary>
     /// 持久化到物理文件操作类
     /// </summary>
-#if !NET45
-    internal class FileStorage : IStorage
-#else
     public class FileStorage : IStorage
-#endif
     {
         /// <summary>
         /// 获得/设置 物理文件持久化文件目录名称 默认 TaskStorage
@@ -31,64 +29,85 @@ namespace Longbow.Tasks
         /// 构造函数
         /// </summary>
         /// <param name="options"></param>
-#if !NET45
         public FileStorage(IOptionsMonitor<FileStorageOptions> options)
         {
             options.OnChange(op => Options = op);
             Options = options.CurrentValue;
         }
-#else
-        public FileStorage(FileStorageOptions options)
-        {
-            Options = options;
-        }
-#endif
 
         /// <summary>
         /// 从物理文件加载 ITrigger 触发器
         /// </summary>
-        /// <param name="schedulerName">任务调度器名称</param>
-        /// <param name="trigger"></param>
         /// <returns></returns>
-        public bool Load(string schedulerName, ITrigger trigger)
+        public virtual Task LoadAsync()
         {
             // 从文件加载
             Exception = null;
-            var ret = true;
             if (Options.Enabled)
             {
-                var fileName = RetrieveFileNameBySchedulerName(schedulerName);
-                if (File.Exists(fileName))
+                RetrieveSchedulers().AsParallel().ForAll(fileName =>
                 {
-                    try
+                    if (File.Exists(fileName))
                     {
-                        lock (locker) trigger.Deserialize(fileName, Options);
+                        try
+                        {
+                            lock (locker)
+                            {
+                                var scheduleName = Path.GetFileNameWithoutExtension(fileName);
+                                var trigger = JsonSerializeExtensions.Deserialize(fileName, Options);
+                                var task = CreateTaskByScheduleName(scheduleName);
+                                if (task != null)
+                                {
+                                    TaskServicesManager.GetOrAdd(scheduleName, task, trigger);
+                                }
+                                else
+                                {
+                                    var callback = CreateCallbackByScheduleName(scheduleName);
+                                    if (callback != null)
+                                    {
+                                        TaskServicesManager.GetOrAdd(scheduleName, callback, trigger);
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Exception = ex;
+
+                            // load 失败删除文件防止一直 load 出错
+                            var target = $"{fileName}.err";
+                            if (File.Exists(target)) File.Delete(target);
+                            File.Move(fileName, $"{fileName}.err");
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Exception = ex;
-                        ret = false;
-                        // load 失败删除文件防止一直 load 出错
-                        var target = $"{fileName}.err";
-                        if (File.Exists(target)) File.Delete(target);
-                        File.Move(fileName, $"{fileName}.err");
-                    }
-                }
+                });
             }
-            return ret;
+            return Task.CompletedTask;
         }
 
-        private static readonly object locker = new object();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scheduleName"></param>
+        /// <returns></returns>
+        protected virtual ITask? CreateTaskByScheduleName(string scheduleName) => null;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scheduleName"></param>
+        /// <returns></returns>
+        protected virtual Func<CancellationToken, Task>? CreateCallbackByScheduleName(string scheduleName) => null;
+
+        private static readonly object locker = new();
         /// <summary>
         /// 持久化 ITrigger 实例到物理文件
         /// </summary>
         /// <param name="schedulerName">任务调度器名称</param>
         /// <param name="trigger"></param>
         /// <returns></returns>
-        public bool Save(string schedulerName, ITrigger trigger)
+        public virtual bool Save(string schedulerName, ITrigger trigger)
         {
-            if (trigger == null) throw new ArgumentNullException(nameof(trigger));
-
             Exception = null;
             var ret = true;
             if (Options.Enabled)
@@ -110,22 +129,20 @@ namespace Longbow.Tasks
         /// 移除指定任务调度
         /// </summary>
         /// <param name="schedulerNames">要移除调度名称集合</param>
-        public bool Remove(IEnumerable<string> schedulerNames)
+        public virtual bool Remove(IEnumerable<string> schedulerNames)
         {
             var ret = true;
             if (Options.DeleteFileByRemoveEvent)
             {
                 schedulerNames.AsParallel().ForAll(name =>
                 {
-                    var fileName = RetrieveFileNameBySchedulerName(name);
+                    var files = RetrieveSchedulers();
                     try
                     {
-                        if (File.Exists(fileName))
+                        var file = files.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f).Equals(name, StringComparison.OrdinalIgnoreCase));
+                        if (file != null)
                         {
-                            lock (locker)
-                            {
-                                File.Delete(fileName);
-                            }
+                            File.Delete(file);
                         }
                     }
                     catch (Exception ex)
@@ -139,18 +156,29 @@ namespace Longbow.Tasks
         }
 
         /// <summary>
-        /// 通过指定调度器名称获得持久化文件名称
+        /// 
         /// </summary>
-        /// <param name="schedulerName">调度器名称</param>
+        /// <param name="schedulerName"></param>
         /// <returns></returns>
-        protected string RetrieveFileNameBySchedulerName(string schedulerName)
+        protected virtual string RetrieveFileNameBySchedulerName(string schedulerName)
         {
-#if !NET45
             var folder = Options.Folder.GetOSPlatformPath();
-#else
-            var folder = Options.Folder;
-#endif
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", folder, $"{schedulerName}.bin");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<string> RetrieveSchedulers()
+        {
+            var folder = Options.Folder.GetOSPlatformPath();
+            var workFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", folder);
+            if (!Directory.Exists(workFolder))
+            {
+                Directory.CreateDirectory(workFolder);
+            }
+            return Directory.EnumerateFiles(workFolder, "*.bin", SearchOption.TopDirectoryOnly);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Longbow.Tasks;
 using Microsoft.Extensions.Options;
 using System;
@@ -28,4 +29,3 @@ namespace Microsoft.Extensions.DependencyInjection
         }
     }
 }
-#endif

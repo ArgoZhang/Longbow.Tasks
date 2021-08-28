@@ -1,4 +1,6 @@
-﻿namespace Longbow.Tasks
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+namespace Longbow.Tasks
 {
     /// <summary>
     /// 触发器执行结果

@@ -1,4 +1,5 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Longbow.Tasks
@@ -20,4 +21,3 @@ namespace Longbow.Tasks
         public IServiceCollection Services { get; }
     }
 }
-#endif

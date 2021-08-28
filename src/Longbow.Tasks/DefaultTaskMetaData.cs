@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Longbow.Tasks

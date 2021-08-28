@@ -1,8 +1,8 @@
-﻿#if NETCOREAPP3_1
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-#endif
 using static Longbow.Tasks.TaskStorageTest;
 using System;
 using System.Threading;
@@ -16,11 +16,7 @@ using System.Text;
 namespace Longbow.Tasks
 {
     [CollectionDefinition("TaskStorageContext")]
-#if NETCOREAPP3_1
     public class TaskStorageContext : ICollectionFixture<TestWebHost<Startup>>
-#else
-    public class TaskStorageContext : ICollectionFixture<Startup>
-#endif
     {
 
     }
@@ -28,18 +24,11 @@ namespace Longbow.Tasks
     [Collection("TaskStorageContext")]
     public class TaskStorageTest : IDisposable
     {
-#if NETCOREAPP3_1
         public TaskStorageTest(TestWebHost<Startup> factory)
         {
             var _ = factory.CreateDefaultClient();
             InitStorage();
         }
-#else
-        public TaskStorageTest(Startup factory)
-        {
-            InitStorage();
-        }
-#endif
 
         private void InitStorage()
         {
@@ -122,13 +111,8 @@ namespace Longbow.Tasks
             await Task.Delay(300);
 
             // 利用发射获得 IStorage 实例
-#if NETCOREAPP3_1
             var factory = typeof(TaskServicesManager).GetProperty("Factory", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
             var instance = factory.GetValue(null, null);
-#else
-            var factory = typeof(TaskServicesManager).GetField("Factory", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-            var instance = factory.GetValue(null);
-#endif
             var storageInstance = instance.GetType().GetProperty("Storage").GetValue(instance);
             var option = storageInstance.GetType().GetProperty("Options").GetValue(storageInstance) as FileStorageOptions;
             option.DeleteFileByRemoveEvent = true;
@@ -179,7 +163,6 @@ namespace Longbow.Tasks
 
         public class Startup
         {
-#if NETCOREAPP3_1
             public Startup(IConfiguration configuration)
             {
                 Configuration = configuration;
@@ -192,7 +175,7 @@ namespace Longbow.Tasks
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddLogging(builder => builder.AddFileLogger());
-                services.AddTaskServices(builder => builder.AddFileStorage(op => op.DeleteFileByRemoveEvent = false));
+                services.AddTaskServices(builder => builder.AddFileStorage<FileStorage>(op => op.DeleteFileByRemoveEvent = false));
                 services.AddControllers();
                 services.AddRouting();
             }
@@ -203,12 +186,6 @@ namespace Longbow.Tasks
                 app.UseRouting();
                 app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
             }
-#else
-            public Startup()
-            {
-                TaskServicesManager.Init(options: new TaskServicesOptions(), storage: new FileStorage(new FileStorageOptions() { DeleteFileByRemoveEvent = false }));
-            }
-#endif
         }
     }
 }

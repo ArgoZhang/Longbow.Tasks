@@ -1,4 +1,6 @@
-﻿using Cronos;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using Cronos;
 using System;
 using System.Collections.Generic;
 using System.Threading;

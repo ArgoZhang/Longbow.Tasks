@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;

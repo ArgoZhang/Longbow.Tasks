@@ -1,8 +1,10 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-#if NET45 || NETSTANDARD2_0
+#if NETSTANDARD2_0
 using Newtonsoft.Json;
 #else
 using System.Text.Json;
@@ -15,8 +17,8 @@ namespace Longbow.Tasks
     /// </summary>
     internal static class JsonSerializeExtensions
     {
-#if !NET45 && !NETSTANDARD2_0
-        private static readonly Lazy<JsonSerializerOptions> _option = new Lazy<JsonSerializerOptions>(() => new JsonSerializerOptions
+#if !NETSTANDARD2_0
+        private static readonly Lazy<JsonSerializerOptions> _option = new(() => new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
@@ -25,20 +27,35 @@ namespace Longbow.Tasks
         /// <summary>
         /// 通过指定文件得到反序列化对象实例
         /// </summary>
-        /// <param name="trigger"></param>
         /// <param name="fileName"></param>
         /// <param name="option"></param>
         /// <returns></returns>
-        public static void Deserialize(this ITrigger trigger, string fileName, FileStorageOptions option)
+        public static ITrigger? Deserialize(string fileName, FileStorageOptions option)
         {
+            ITrigger? ret = null;
             var data = File.ReadAllText(fileName);
-            if (option.Secure) data = data.Decrypte(option);
-#if !NET45 && !NETSTANDARD2_0
-            var obj = JsonSerializer.Deserialize<StorageObject>(data, _option.Value);
-#else
+            if (option.Secure)
+            {
+                data = data.Decrypte(option);
+            }
+#if NETSTANDARD2_0
             var obj = JsonConvert.DeserializeObject<StorageObject>(data);
+#else
+            var obj = JsonSerializer.Deserialize<StorageObject>(data, _option.Value);
 #endif
-            trigger.LoadData(obj!.KeyValues);
+            if (obj != null && !string.IsNullOrEmpty(obj.Type))
+            {
+                var triggerType = Type.GetType(obj.Type);
+                if (triggerType != null)
+                {
+                    ret = Activator.CreateInstance(triggerType) as ITrigger;
+                    if (ret != null)
+                    {
+                        ret.LoadData(obj.KeyValues);
+                    }
+                }
+            }
+            return ret;
         }
 
         /// <summary>
@@ -56,13 +73,20 @@ namespace Longbow.Tasks
                 KeyValues = trigger.SetData()
             };
             var folder = Path.GetDirectoryName(fileName);
-            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder!);
-#if !NET45 && !NETSTANDARD2_0
-            var data = JsonSerializer.Serialize(obj);
-#else
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder!);
+            }
+#if NETSTANDARD2_0
             var data = JsonConvert.SerializeObject(obj);
+#else
+            var data = JsonSerializer.Serialize(obj);
 #endif
-            if (option.Secure) data = data.Encrypte(option);
+            if (option.Secure)
+            {
+                data = data.Encrypte(option);
+            }
+
             File.WriteAllText(fileName, data);
         }
 

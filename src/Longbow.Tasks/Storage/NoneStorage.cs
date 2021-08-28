@@ -1,5 +1,8 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Longbow.Tasks
 {
@@ -7,7 +10,7 @@ namespace Longbow.Tasks
     {
         public Exception? Exception { get; }
 
-        public bool Load(string schedulerName, ITrigger trigger) => true;
+        public Task LoadAsync() => Task.CompletedTask;
 
         public bool Remove(IEnumerable<string> schedulerNames) => true;
 

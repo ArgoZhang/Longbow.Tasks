@@ -1,4 +1,6 @@
-﻿namespace Longbow.Tasks
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+namespace Longbow.Tasks
 {
     /// <summary>
     /// 调度器枚举类型

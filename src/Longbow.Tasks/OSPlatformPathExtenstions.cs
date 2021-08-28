@@ -1,4 +1,6 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+#if !NET45
 using System.IO;
 using System.Runtime.InteropServices;
 

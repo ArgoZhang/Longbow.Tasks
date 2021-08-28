@@ -1,7 +1,7 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-#endif
 using System;
 
 namespace Longbow.Tasks
@@ -17,7 +17,6 @@ namespace Longbow.Tasks
         public TimeSpan ShutdownTimeout { get; set; } = TimeSpan.FromSeconds(5);
     }
 
-#if !NET45
     /// <summary>
     /// 缓存配置类
     /// </summary>
@@ -34,5 +33,4 @@ namespace Longbow.Tasks
 
         }
     }
-#endif
 }

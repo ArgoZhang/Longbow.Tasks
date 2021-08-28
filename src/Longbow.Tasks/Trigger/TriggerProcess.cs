@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,9 +74,6 @@ namespace Longbow.Tasks
             _triggerCancelTokenSource = new CancellationTokenSource();
             _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_triggerCancelTokenSource.Token, _schedulerCancelToken);
 
-            // Load storage
-            Trigger.Load(Name, Storage, LoggerAction);
-
             // 异步执行触发器开始心跳
             Task.Run(async () =>
             {
@@ -94,12 +93,15 @@ namespace Longbow.Tasks
                     var sw = Stopwatch.StartNew();
                     await DoWork(_cancelTokenSource.Token).ConfigureAwait(false);
                     sw.Stop();
+
                     Trigger.LastRunElapsedTime = sw.Elapsed;
                     Trigger.PulseCallback?.Invoke(Trigger);
                     LoggerAction($"{Trigger.GetType().Name} {nameof(DoWork)}({Trigger.LastResult}) Elapsed: {Trigger.LastRunElapsedTime} NextRuntime: {Trigger.NextRuntime}");
                     if (Trigger.NextRuntime == null) break;
+
+                    // 持久化
+                    Trigger.Save(Name, Storage, LoggerAction);
                 }
-                Trigger.Save(Name, Storage, LoggerAction);
             });
         }
 

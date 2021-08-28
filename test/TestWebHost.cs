@@ -1,4 +1,5 @@
-﻿#if NETCOREAPP3_1
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -27,4 +28,3 @@ namespace Longbow.Tasks
         }
     }
 }
-#endif

@@ -1,7 +1,7 @@
-﻿#if !NET45
+﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-#endif
 
 namespace Longbow.Tasks
 {
@@ -41,7 +41,7 @@ namespace Longbow.Tasks
         /// </summary>
         public bool DeleteFileByRemoveEvent { get; set; } = true;
     }
-#if !NET45
+
     /// <summary>
     /// 缓存配置类
     /// </summary>
@@ -58,5 +58,4 @@ namespace Longbow.Tasks
 
         }
     }
-#endif
 }
