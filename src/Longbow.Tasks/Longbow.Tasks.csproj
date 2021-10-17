@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks>
-    <Version>5.2.0</Version>
+    <Version>5.2.1</Version>
     <Copyright>Longbow</Copyright>
     <Description>Longbow Component for .net core 2.0+</Description>
     <Authors>Argo Zhang(argo@163.com)</Authors>
