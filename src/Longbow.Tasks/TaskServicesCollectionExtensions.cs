@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
 using Longbow.Tasks;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
 
@@ -20,9 +21,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddTaskServices(this IServiceCollection services, Action<ITaskStorageBuilder>? configure = null)
         {
             // 创建服务
-            services.AddSingleton<IStorage, NoneStorage>();
-            services.AddSingleton<IConfigureOptions<TaskServicesOptions>, TaskServicesConfigureOptions<TaskServicesOptions>>();
-            services.AddSingleton<IOptionsChangeTokenSource<TaskServicesOptions>, ConfigurationChangeTokenSource<TaskServicesOptions>>();
+            services.TryAddSingleton<IStorage, NoneStorage>();
+            services.TryAddSingleton<IConfigureOptions<TaskServicesOptions>, TaskServicesConfigureOptions<TaskServicesOptions>>();
+            services.TryAddSingleton<IOptionsChangeTokenSource<TaskServicesOptions>, ConfigurationChangeTokenSource<TaskServicesOptions>>();
             services.AddHostedService<TaskServicesFactory>();
             configure?.Invoke(new TaskStorageBuilder(services));
             return services;
