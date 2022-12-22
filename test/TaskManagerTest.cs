@@ -604,7 +604,7 @@ namespace Longbow.Tasks
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddRouting();
-                services.AddLogging(builder => builder.AddProvider(new LoggerProvider(Log)).AddFileLogger());
+                services.AddLogging(builder => builder.AddProvider(new LoggerProvider()).AddFileLogger());
                 services.AddMvcCore();
                 services.AddTaskServices();
             }

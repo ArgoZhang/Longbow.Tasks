@@ -67,7 +67,7 @@ namespace Longbow.Tasks
                 return Task.CompletedTask;
             });
             var state = locker.WaitOne(500);
-            var fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"TaskStorage{Path.DirectorySeparatorChar}StorageRunOnce.bin");
+            var fileName = Path.Combine(AppContext.BaseDirectory, $"TaskStorage{Path.DirectorySeparatorChar}StorageRunOnce.bin");
             Assert.True(File.Exists(fileName));
             File.Delete(fileName);
             Assert.Equal(1, count);
