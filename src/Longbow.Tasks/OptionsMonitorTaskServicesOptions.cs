@@ -14,8 +14,11 @@ namespace Longbow.Tasks
 
         public TaskServicesOptions CurrentValue { get; }
 
+#if NET6_0
         public TaskServicesOptions Get(string name) => CurrentValue;
-
+#else
+        public TaskServicesOptions Get(string? name) => CurrentValue;
+#endif
         public IDisposable OnChange(Action<TaskServicesOptions, string> listener) => null!;
     }
 }

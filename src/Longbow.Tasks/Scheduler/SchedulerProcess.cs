@@ -66,7 +66,7 @@ namespace Longbow.Tasks
         /// <summary>
         /// 任务构造函数初始化取消令牌
         /// </summary>
-        private readonly CancellationTokenSource _initToken = new CancellationTokenSource();
+        private readonly CancellationTokenSource _initToken = new();
 
         /// <summary>
         /// 调度开始 每次调用
@@ -131,7 +131,7 @@ namespace Longbow.Tasks
                 catch (Exception ex)
                 {
                     _sche.Exception = ex;
-                    ex.Log();
+                    LoggerAction(ex.FormatException());
                 }
 
                 // 设置 Trigger 状态

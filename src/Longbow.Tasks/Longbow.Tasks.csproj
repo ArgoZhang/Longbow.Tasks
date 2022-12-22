@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks>
-    <Version>5.2.1</Version>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <Version>7.0.0</Version>
     <Copyright>Longbow</Copyright>
     <Description>Longbow Component for .net core 2.0+</Description>
     <Authors>Argo Zhang(argo@163.com)</Authors>
@@ -17,19 +17,18 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+    <PackageReference Include="Longbow.Logging" Version="6.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Longbow.Logging" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Longbow.Cronos" Version="1.0.0" />
-    <PackageReference Include="Longbow.Logging" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

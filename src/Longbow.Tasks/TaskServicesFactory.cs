@@ -94,7 +94,7 @@ namespace Longbow.Tasks
         /// <param name="message">日志内容</param>
         public void Log(string message)
         {
-            Logger.Log(LogLevel.Information, $"{DateTimeOffset.Now}: {message}");
+            Logger.Log(LogLevel.Information, "{DateTime}: {message}", DateTimeOffset.Now, message);
         }
 
         /// <summary>
