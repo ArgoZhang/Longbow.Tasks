@@ -1,36 +1,31 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using static Longbow.Tasks.TaskStorageTest;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
-namespace Longbow.Tasks
+namespace Longbow.Tasks.Test
 {
     [CollectionDefinition("TaskStorageContext")]
-    public class TaskStorageContext : ICollectionFixture<TestWebHost<Startup>>
+    public class TaskStorageContext : ICollectionFixture<TestHost>
     {
 
     }
 
     [Collection("TaskStorageContext")]
-    public class TaskStorageTest : IDisposable
+    public class TaskStorageTest
     {
-        public TaskStorageTest(TestWebHost<Startup> factory)
+        public TaskStorageTest(TestHost factory)
         {
-            var _ = factory.CreateDefaultClient();
             InitStorage();
         }
 
-        private void InitStorage()
+        private static void InitStorage()
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"TaskStorage");
             if (Directory.Exists(path))
@@ -42,13 +37,13 @@ namespace Longbow.Tasks
             }
         }
 
-        private AutoResetEvent locker = new AutoResetEvent(false);
+        private readonly AutoResetEvent locker = new(false);
 
         [Fact]
         public async void RunOnce_Ok()
         {
             var count = 0;
-            var sche = TaskServicesManager.GetOrAdd("StorageRunOnce", token =>
+            var scheduler = TaskServicesManager.GetOrAdd("StorageRunOnce", (provider, token) =>
             {
                 count++;
                 locker.Set();
@@ -60,7 +55,7 @@ namespace Longbow.Tasks
             // 等待序列化完成
             await Task.Delay(500);
             TaskServicesManager.Clear();
-            sche = TaskServicesManager.GetOrAdd("StorageRunOnce", token =>
+            scheduler = TaskServicesManager.GetOrAdd("StorageRunOnce", (provider, token) =>
             {
                 count++;
                 locker.Set();
@@ -77,7 +72,7 @@ namespace Longbow.Tasks
         [Fact]
         public async void Recurring_Ok()
         {
-            var sche = TaskServicesManager.GetOrAdd("StorageRecurring", token =>
+            var scheduler = TaskServicesManager.GetOrAdd("StorageRecurring", (provider, token) =>
             {
                 locker.Set();
                 return Task.CompletedTask;
@@ -87,7 +82,7 @@ namespace Longbow.Tasks
 
             TaskServicesManager.Clear();
             await Task.Delay(500);
-            sche = TaskServicesManager.GetOrAdd("StorageRecurring", token =>
+            scheduler = TaskServicesManager.GetOrAdd("StorageRecurring", (provider, token) =>
             {
                 locker.Set();
                 return Task.CompletedTask;
@@ -102,7 +97,7 @@ namespace Longbow.Tasks
         [Fact]
         public async void DeleteStorageFile_Ok()
         {
-            var sche = TaskServicesManager.GetOrAdd("DeleteStorageFile", token =>
+            var scheduler = TaskServicesManager.GetOrAdd("DeleteStorageFile", (provider, token) =>
             {
                 locker.Set();
                 return Task.CompletedTask;
@@ -154,38 +149,6 @@ namespace Longbow.Tasks
             var buffer2 = decryptor.TransformFinalBlock(buffer, 0, buffer.Length);
             var result = Encoding.UTF8.GetString(buffer2);
             Assert.Equal(content, result);
-        }
-
-        public void Dispose()
-        {
-
-        }
-
-        public class Startup
-        {
-            public Startup(IConfiguration configuration)
-            {
-                Configuration = configuration;
-                Configuration["TaskServicesOptions:FileStorageOptions:Enabled"] = "true";
-            }
-
-            public IConfiguration Configuration { get; }
-
-            // This method gets called by the runtime. Use this method to add services to the container.
-            public void ConfigureServices(IServiceCollection services)
-            {
-                services.AddLogging(builder => builder.AddFileLogger());
-                services.AddTaskServices(builder => builder.AddFileStorage<FileStorage>(op => op.DeleteFileByRemoveEvent = false));
-                services.AddControllers();
-                services.AddRouting();
-            }
-
-            // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-            public void Configure(IApplicationBuilder app)
-            {
-                app.UseRouting();
-                app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
-            }
         }
     }
 }
