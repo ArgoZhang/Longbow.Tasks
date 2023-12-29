@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,24 +13,28 @@ namespace Longbow.Tasks
     /// <summary>
     /// 后台服务工厂操作类
     /// </summary>
-    internal sealed class TaskServicesFactory : IDisposable, IHostedService
+    sealed class TaskServicesFactory : IDisposable, IHostedService
     {
         private readonly CancellationTokenSource _shutdownCts = new();
 
         private TaskServicesOptions _options;
+
+        public IServiceProvider ServiceProvider { get; }
+
         internal static TaskServicesFactory? Instance { get; set; }
+
         /// <summary>
         /// 默认构造函数
         /// </summary>
-        /// <param name="logger">ILogger(TaskServicesFactory) 实例</param>
-        /// <param name="options">后台服务配置类实例</param>
-        /// <param name="storage">IStorage 任务持久化接口实例</param>
-        public TaskServicesFactory(ILogger<TaskServicesFactory> logger, IOptionsMonitor<TaskServicesOptions> options, IStorage storage)
+        /// <param name="serviceProvider">服务容器</param>
+        public TaskServicesFactory(IServiceProvider serviceProvider)
         {
-            Logger = logger;
+            ServiceProvider = serviceProvider;
+            Logger = ServiceProvider.GetRequiredService<ILogger<TaskServicesFactory>>();
+            var options = ServiceProvider.GetRequiredService<IOptionsMonitor<TaskServicesOptions>>();
             _options = options.CurrentValue;
             options.OnChange(op => _options = op);
-            Storage = storage;
+            Storage = ServiceProvider.GetRequiredService<IStorage>();
             Instance = this;
         }
 
@@ -39,11 +44,19 @@ namespace Longbow.Tasks
         /// <param name="options"></param>
         /// <param name="storage"></param>
         /// <returns></returns>
-        internal static void Create(TaskServicesOptions? options, IStorage storage)
+        internal static TaskServicesFactory Create(TaskServicesOptions? options, IStorage storage)
         {
+            var sc = new ServiceCollection();
+            sc.AddSingleton<IStorage>(storage);
+
             var op = new OptionsMonitorTaskServicesOptions(options ?? new TaskServicesOptions());
+            sc.AddSingleton<IOptionsMonitor<TaskServicesOptions>>(op);
+
             var logger = new TaskServicesFactoryLogger();
-            var _ = new TaskServicesFactory(logger, op, storage);
+            sc.AddSingleton<ILogger<TaskServicesFactory>>(logger);
+
+            var sp = sc.BuildServiceProvider();
+            return new TaskServicesFactory(sp);
         }
 
         /// <summary>

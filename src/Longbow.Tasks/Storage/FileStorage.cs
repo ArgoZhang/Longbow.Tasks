@@ -97,7 +97,7 @@ namespace Longbow.Tasks
         /// </summary>
         /// <param name="scheduleName"></param>
         /// <returns></returns>
-        protected virtual Func<CancellationToken, Task>? CreateCallbackByScheduleName(string scheduleName) => null;
+        protected virtual Func<IServiceProvider, CancellationToken, Task>? CreateCallbackByScheduleName(string scheduleName) => null;
 
         private static readonly object locker = new();
         /// <summary>

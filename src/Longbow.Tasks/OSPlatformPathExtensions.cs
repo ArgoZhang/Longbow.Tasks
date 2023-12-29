@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace System
 {
-    internal static class OSPlatformPathExtenstions
+    internal static class OSPlatformPathExtensions
     {
         /// <summary>
         /// 获得 当前操作系统目录分隔符的路径

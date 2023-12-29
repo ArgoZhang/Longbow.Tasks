@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <Version>7.0.0</Version>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <Version>8.0.0</Version>
     <Copyright>Longbow</Copyright>
-    <Description>Longbow Component for .net core 2.0+</Description>
+    <Description>Longbow Component for .net 6.0+</Description>
     <Authors>Argo Zhang(argo@163.com)</Authors>
     <Product>Longbow Tasks</Product>
     <Company>Longbow</Company>
@@ -24,6 +24,11 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Longbow.Logging" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Longbow.Logging" Version="7.0.0" />
   </ItemGroup>
 

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -32,24 +33,49 @@ namespace Longbow.Tasks
         /// </summary>
         /// <param name="cancellationToken">取消令牌</param>
         /// <returns></returns>
+        [Obsolete("已过期，请使用 IServiceProvider 重载方法")]
         public Task Execute(CancellationToken cancellationToken)
         {
-            var runable = !string.IsNullOrEmpty(Command) && File.Exists(Command);
-            if (runable)
+            var valid = !string.IsNullOrEmpty(Command) && File.Exists(Command);
+            if (valid)
             {
                 var startInfo = new ProcessStartInfo(Command, Arguments);
                 ConfigureStartInfo(startInfo);
                 var process = Process.Start(startInfo);
-                if (WaitForExit) process!.WaitForExit();
+                if (process != null && WaitForExit) process.WaitForExit();
             }
-            return Task.FromResult(runable);
+            return Task.FromResult(valid);
+        }
+
+        public Task Execute(IServiceProvider provider, CancellationToken cancellationToken)
+        {
+            var valid = !string.IsNullOrEmpty(Command) && File.Exists(Command);
+            if (valid)
+            {
+                var startInfo = new ProcessStartInfo(Command, Arguments);
+                ConfigureStartInfo(provider, startInfo);
+                var process = Process.Start(startInfo);
+                if (process != null && WaitForExit) process.WaitForExit();
+            }
+            return Task.FromResult(valid);
         }
 
         /// <summary>
         /// 配置 ProcessStartInfo 实例
         /// </summary>
         /// <param name="startInfo"></param>
+        [Obsolete("已过期，请使用 IServiceProvider 重载方法")]
         protected virtual void ConfigureStartInfo(ProcessStartInfo startInfo)
+        {
+
+        }
+
+        /// <summary>
+        /// 配置 ProcessStartInfo 实例
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="startInfo"></param>
+        protected virtual void ConfigureStartInfo(IServiceProvider provider, ProcessStartInfo startInfo)
         {
 
         }

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -79,7 +81,17 @@ namespace Longbow.Tasks
         /// <param name="methodCall">创建任务委托 string 为 Scheduler 名称</param>
         /// <param name="trigger">ITrigger 实例 为空时内部使用 TriggerBuilder.Default</param>
         /// <returns>返回 IScheduler 实例</returns>
+        [Obsolete("已过期，请使用 IServiceProvider 重载方法")]
         public static IScheduler GetOrAdd(string schedulerName, Func<CancellationToken, Task> methodCall, ITrigger? trigger = null) => GetOrAdd(schedulerName, new DefaultTask(methodCall), trigger);
+
+        /// <summary>
+        /// 将任务与触发器添加到调度中 多线程安全
+        /// </summary>
+        /// <param name="schedulerName">Scheduler 名称</param>
+        /// <param name="methodCall">创建任务委托 string 为 Scheduler 名称</param>
+        /// <param name="trigger">ITrigger 实例 为空时内部使用 TriggerBuilder.Default</param>
+        /// <returns>返回 IScheduler 实例</returns>
+        public static IScheduler GetOrAdd(string schedulerName, Func<IServiceProvider, CancellationToken, Task> methodCall, ITrigger? trigger = null) => GetOrAdd(schedulerName, new DefaultTask(methodCall), trigger);
 
         /// <summary>
         /// 将任务与触发器添加到调度中 多线程安全
@@ -104,12 +116,12 @@ namespace Longbow.Tasks
             {
                 throw new InvalidOperationException("Please Call the AddTaskServices method in the Startup ConfigureServices first.");
             }
-            var sche = new DefaultScheduler(key);
-            var process = new SchedulerProcess(sche, Factory.Log, Factory.Storage);
+            var scheduler = new DefaultScheduler(key);
+            var process = new SchedulerProcess(scheduler, Factory.Log, Factory.Storage);
             process.LoggerAction($"{nameof(TaskServicesManager)} {nameof(DefaultScheduler)}({key}) Created");
 
             // 关联调度与调度执行器
-            sche.SchedulerProcess = process;
+            scheduler.SchedulerProcess = process;
             return process;
         }
 
@@ -120,11 +132,11 @@ namespace Longbow.Tasks
         public static bool Remove(string schedulerName)
         {
             Factory?.Storage.Remove(new string[] { schedulerName });
-            var ret = _schedulerPool.TryRemove(schedulerName, out var sche);
-            if (ret && sche != null)
+            var ret = _schedulerPool.TryRemove(schedulerName, out var scheduler);
+            if (ret && scheduler != null)
             {
-                sche.Value.LoggerAction("Remove()");
-                sche.Value.Stop();
+                scheduler.Value.LoggerAction("Remove()");
+                scheduler.Value.Stop();
             }
             return ret;
         }
@@ -135,8 +147,8 @@ namespace Longbow.Tasks
         public static void Clear()
         {
             Shutdown();
-            var sches = _schedulerPool.Keys;
-            Factory?.Storage.Remove(sches);
+            var scheduler = _schedulerPool.Keys;
+            Factory?.Storage.Remove(scheduler);
             _schedulerPool.Clear();
         }
 
@@ -151,9 +163,9 @@ namespace Longbow.Tasks
         /// </summary>
         internal static void Shutdown(CancellationToken token = default)
         {
-            foreach (var sche in _schedulerPool.Values)
+            foreach (var scheduler in _schedulerPool.Values)
             {
-                sche.Value.Stop();
+                scheduler.Value.Stop();
                 if (token.IsCancellationRequested)
                 {
                     break;
