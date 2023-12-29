@@ -18,7 +18,7 @@ using Xunit.Abstractions;
 namespace Longbow.Tasks.Test;
 
 [CollectionDefinition("TaskManagerContext")]
-public class TaskManagerContext : ICollectionFixture<Program>
+public class TaskManagerContext : ICollectionFixture<TestHost>
 {
 
 }

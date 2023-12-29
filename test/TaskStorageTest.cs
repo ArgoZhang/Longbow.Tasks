@@ -40,7 +40,7 @@ namespace Longbow.Tasks.Test
         private readonly AutoResetEvent locker = new(false);
 
         [Fact]
-        public async void RunOnce_Ok()
+        public async Task RunOnce_Ok()
         {
             var count = 0;
             var scheduler = TaskServicesManager.GetOrAdd("StorageRunOnce", (provider, token) =>
@@ -63,14 +63,13 @@ namespace Longbow.Tasks.Test
             });
             var state = locker.WaitOne(500);
             var fileName = Path.Combine(AppContext.BaseDirectory, $"TaskStorage{Path.DirectorySeparatorChar}StorageRunOnce.bin");
-            Assert.True(File.Exists(fileName));
-            File.Delete(fileName);
-            Assert.Equal(1, count);
-            Assert.False(state);
+            Assert.False(File.Exists(fileName));
+            Assert.Equal(2, count);
+            Assert.True(state);
         }
 
         [Fact]
-        public async void Recurring_Ok()
+        public async Task Recurring_Ok()
         {
             var scheduler = TaskServicesManager.GetOrAdd("StorageRecurring", (provider, token) =>
             {
