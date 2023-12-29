@@ -20,9 +20,9 @@ namespace Longbow.Tasks
         /// <returns></returns>
         public static ITaskStorageBuilder AddFileStorage<TStorage>(this ITaskStorageBuilder builder, Action<FileStorageOptions>? configure = null) where TStorage : FileStorage
         {
-            builder.Services.TryAddSingleton<IStorage, TStorage>();
-            builder.Services.TryAddSingleton<IOptionsChangeTokenSource<FileStorageOptions>, ConfigurationChangeTokenSource<FileStorageOptions>>();
-            builder.Services.TryAddSingleton<IConfigureOptions<FileStorageOptions>, FileStorageOptionsConfigureOptions<FileStorageOptions>>();
+            builder.Services.AddSingleton<IStorage, TStorage>();
+            builder.Services.AddSingleton<IOptionsChangeTokenSource<FileStorageOptions>, ConfigurationChangeTokenSource<FileStorageOptions>>();
+            builder.Services.AddSingleton<IConfigureOptions<FileStorageOptions>, FileStorageOptionsConfigureOptions<FileStorageOptions>>();
             if (configure != null) builder.Services.Configure(configure);
             return builder;
         }
