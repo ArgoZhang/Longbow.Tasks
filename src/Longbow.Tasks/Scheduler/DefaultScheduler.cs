@@ -87,5 +87,24 @@ namespace Longbow.Tasks
         /// </summary>
         /// <param name="name"></param>
         public DefaultScheduler(string name) => Name = name;
+
+        /// <summary>
+        /// 额外的数据
+        /// </summary>
+        private object? Data { get; set; }
+
+        /// <summary>
+        /// 设置 额外的数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        public void SetData<T>(T? data) where T : class => Data = data;
+
+        /// <summary>
+        /// 获得 额外的数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T? GetData<T>() where T : class => Data as T;
     }
 }

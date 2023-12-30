@@ -54,5 +54,15 @@ namespace Longbow.Tasks
         /// 获得 调度器相关联任务
         /// </summary>
         ITask? Task { get; }
+
+        /// <summary>
+        /// 设置 额外的数据
+        /// </summary>
+        void SetData<T>(T? data) where T : class;
+
+        /// <summary>
+        /// 获得 额外的数据
+        /// </summary>
+        T? GetData<T>() where T : class;
     }
 }
