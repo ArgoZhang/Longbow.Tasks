@@ -1,15 +1,8 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
-using Longbow.Logging;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -392,7 +385,7 @@ public class TaskManagerTest : IDisposable
     [Fact]
     public async void Task_Timeout()
     {
-        var scheduler = TaskServicesManager.GetOrAdd("Recurring_Timeout", (provider, token) => Task.Delay(500), TriggerBuilder.Default.WithInterval(300).WithRepeatCount(2).WithTimeout(200).Build());
+        var scheduler = TaskServicesManager.GetOrAdd("Recurring_Timeout", (provider, token) => Task.Delay(500, token), TriggerBuilder.Default.WithInterval(300).WithRepeatCount(2).WithTimeout(200).Build());
 
         await Task.Delay(2000);
         Assert.Null(scheduler.NextRuntime);
@@ -418,7 +411,7 @@ public class TaskManagerTest : IDisposable
         var token1 = new CancellationTokenSource();
         var scheduler = TaskServicesManager.GetOrAdd("StartTime", async (provider, token) =>
         {
-            await Task.Delay(10).ConfigureAwait(false);
+            await Task.Delay(10, token);
             Interlocked.Increment(ref ExecuteCount);
             token1.Cancel();
         }, TriggerBuilder.Default.WithStartTime(DateTimeOffset.Now.AddMilliseconds(500)).Build());
@@ -584,38 +577,6 @@ public class TaskManagerTest : IDisposable
         public DelayTask() : base()
         {
             Thread.Sleep(2000);
-        }
-    }
-
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Interlocked.Increment(ref InitCount);
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddRouting();
-            services.AddLogging(builder => builder.AddProvider(new LoggerProvider()).AddFileLogger());
-            services.AddMvcCore();
-            services.AddTaskServices();
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseRouting();
-            app.Run(context =>
-            {
-                context.Response.Body.Write(Encoding.UTF8.GetBytes("UnitTest"));
-                return Task.CompletedTask;
-            });
-            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
         }
     }
 }

@@ -3,20 +3,16 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Longbow.Tasks.Test;
 
-public class DictionaryTest
+public class DictionaryTest(ITestOutputHelper helper)
 {
-    private readonly ITestOutputHelper _helper;
-
-    public DictionaryTest(ITestOutputHelper helper)
-    {
-        _helper = helper;
-    }
+    private readonly ITestOutputHelper _helper = helper;
 
     [Fact]
     public void AddOrUpdate_Bad()
