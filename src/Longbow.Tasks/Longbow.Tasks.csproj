@@ -29,7 +29,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Longbow.Logging" Version="7.0.0" />
+    <PackageReference Include="Longbow.Logging" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

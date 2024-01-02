@@ -81,16 +81,6 @@ public static class TaskServicesManager
     /// <param name="methodCall">创建任务委托 string 为 Scheduler 名称</param>
     /// <param name="trigger">ITrigger 实例 为空时内部使用 TriggerBuilder.Default</param>
     /// <returns>返回 IScheduler 实例</returns>
-    [Obsolete("已过期，请使用 IServiceProvider 重载方法")]
-    public static IScheduler GetOrAdd(string schedulerName, Func<CancellationToken, Task> methodCall, ITrigger? trigger = null) => GetOrAdd(schedulerName, new DefaultTask(methodCall), trigger);
-
-    /// <summary>
-    /// 将任务与触发器添加到调度中 多线程安全
-    /// </summary>
-    /// <param name="schedulerName">Scheduler 名称</param>
-    /// <param name="methodCall">创建任务委托 string 为 Scheduler 名称</param>
-    /// <param name="trigger">ITrigger 实例 为空时内部使用 TriggerBuilder.Default</param>
-    /// <returns>返回 IScheduler 实例</returns>
     public static IScheduler GetOrAdd(string schedulerName, Func<IServiceProvider, CancellationToken, Task> methodCall, ITrigger? trigger = null) => GetOrAdd(schedulerName, new DefaultTask(methodCall), trigger);
 
     /// <summary>
