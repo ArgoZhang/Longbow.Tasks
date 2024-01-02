@@ -8,115 +8,114 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Longbow.Tasks
+namespace Longbow.Tasks;
+
+/// <summary>
+/// 后台服务工厂操作类
+/// </summary>
+sealed class TaskServicesFactory : IDisposable, IHostedService
 {
+    private readonly CancellationTokenSource _shutdownCts = new();
+
+    private TaskServicesOptions _options;
+
+    public IServiceProvider ServiceProvider { get; }
+
+    internal static TaskServicesFactory? Instance { get; set; }
+
     /// <summary>
-    /// 后台服务工厂操作类
+    /// 默认构造函数
     /// </summary>
-    sealed class TaskServicesFactory : IDisposable, IHostedService
+    /// <param name="serviceProvider">服务容器</param>
+    public TaskServicesFactory(IServiceProvider serviceProvider)
     {
-        private readonly CancellationTokenSource _shutdownCts = new();
+        ServiceProvider = serviceProvider;
+        Logger = ServiceProvider.GetRequiredService<ILogger<TaskServicesFactory>>();
+        var options = ServiceProvider.GetRequiredService<IOptionsMonitor<TaskServicesOptions>>();
+        _options = options.CurrentValue;
+        options.OnChange(op => _options = op);
+        Storage = ServiceProvider.GetRequiredService<IStorage>();
+        Instance = this;
+    }
 
-        private TaskServicesOptions _options;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="storage"></param>
+    /// <returns></returns>
+    internal static TaskServicesFactory Create(TaskServicesOptions? options, IStorage storage)
+    {
+        var sc = new ServiceCollection();
+        sc.AddSingleton<IStorage>(storage);
 
-        public IServiceProvider ServiceProvider { get; }
+        var op = new OptionsMonitorTaskServicesOptions(options ?? new TaskServicesOptions());
+        sc.AddSingleton<IOptionsMonitor<TaskServicesOptions>>(op);
 
-        internal static TaskServicesFactory? Instance { get; set; }
+        var logger = new TaskServicesFactoryLogger();
+        sc.AddSingleton<ILogger<TaskServicesFactory>>(logger);
 
-        /// <summary>
-        /// 默认构造函数
-        /// </summary>
-        /// <param name="serviceProvider">服务容器</param>
-        public TaskServicesFactory(IServiceProvider serviceProvider)
-        {
-            ServiceProvider = serviceProvider;
-            Logger = ServiceProvider.GetRequiredService<ILogger<TaskServicesFactory>>();
-            var options = ServiceProvider.GetRequiredService<IOptionsMonitor<TaskServicesOptions>>();
-            _options = options.CurrentValue;
-            options.OnChange(op => _options = op);
-            Storage = ServiceProvider.GetRequiredService<IStorage>();
-            Instance = this;
-        }
+        var sp = sc.BuildServiceProvider();
+        return new TaskServicesFactory(sp);
+    }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="options"></param>
-        /// <param name="storage"></param>
-        /// <returns></returns>
-        internal static TaskServicesFactory Create(TaskServicesOptions? options, IStorage storage)
-        {
-            var sc = new ServiceCollection();
-            sc.AddSingleton<IStorage>(storage);
+    /// <summary>
+    /// 获得 日志实例
+    /// </summary>
+    public ILogger Logger { get; }
 
-            var op = new OptionsMonitorTaskServicesOptions(options ?? new TaskServicesOptions());
-            sc.AddSingleton<IOptionsMonitor<TaskServicesOptions>>(op);
+    /// <summary>
+    /// 获得 任务持久化配置项实例
+    /// </summary>
+    public IStorage Storage { get; }
 
-            var logger = new TaskServicesFactoryLogger();
-            sc.AddSingleton<ILogger<TaskServicesFactory>>(logger);
+    /// <summary>
+    /// IHostedService 接口异步开始方法
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task StartAsync(CancellationToken cancellationToken = default)
+    {
+        Log($"{nameof(TaskServicesFactory)} StartAsync() Started");
 
-            var sp = sc.BuildServiceProvider();
-            return new TaskServicesFactory(sp);
-        }
+        // load task from storage
+        await Storage.LoadAsync();
+    }
 
-        /// <summary>
-        /// 获得 日志实例
-        /// </summary>
-        public ILogger Logger { get; }
+    /// <summary>
+    /// IHostedService 接口异步结束方法
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        Log($"{nameof(TaskServicesFactory)} -> {nameof(StopAsync)}() Shutdown After({_options.ShutdownTimeout})");
+        _shutdownCts.CancelAfter(_options.ShutdownTimeout);
+        WaitForShutdown(CancellationTokenSource.CreateLinkedTokenSource(_shutdownCts.Token, cancellationToken).Token);
+        return Task.CompletedTask;
+    }
 
-        /// <summary>
-        /// 获得 任务持久化配置项实例
-        /// </summary>
-        public IStorage Storage { get; }
+    private void WaitForShutdown(CancellationToken token)
+    {
+        TaskServicesManager.Shutdown(token);
+        Log($"{nameof(TaskServicesFactory)} WaitForShutdown()");
+    }
 
-        /// <summary>
-        /// IHostedService 接口异步开始方法
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task StartAsync(CancellationToken cancellationToken = default)
-        {
-            Log($"{nameof(TaskServicesFactory)} StartAsync() Started");
+    /// <summary>
+    /// 日志记录方法
+    /// </summary>
+    /// <param name="message">日志内容</param>
+    public void Log(string message)
+    {
+        Logger.Log(LogLevel.Information, "{DateTime}: {message}", DateTimeOffset.Now, message);
+    }
 
-            // load task from storage
-            await Storage.LoadAsync();
-        }
-
-        /// <summary>
-        /// IHostedService 接口异步结束方法
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public Task StopAsync(CancellationToken cancellationToken = default)
-        {
-            Log($"{nameof(TaskServicesFactory)} -> {nameof(StopAsync)}() Shutdown After({_options.ShutdownTimeout})");
-            _shutdownCts.CancelAfter(_options.ShutdownTimeout);
-            WaitForShutdown(CancellationTokenSource.CreateLinkedTokenSource(_shutdownCts.Token, cancellationToken).Token);
-            return Task.CompletedTask;
-        }
-
-        private void WaitForShutdown(CancellationToken token)
-        {
-            TaskServicesManager.Shutdown(token);
-            Log($"{nameof(TaskServicesFactory)} WaitForShutdown()");
-        }
-
-        /// <summary>
-        /// 日志记录方法
-        /// </summary>
-        /// <param name="message">日志内容</param>
-        public void Log(string message)
-        {
-            Logger.Log(LogLevel.Information, "{DateTime}: {message}", DateTimeOffset.Now, message);
-        }
-
-        /// <summary>
-        /// Dispose 方法
-        /// </summary>
-        public void Dispose()
-        {
-            Log($"{nameof(TaskServicesFactory)} Disposed");
-            _shutdownCts?.Dispose();
-        }
+    /// <summary>
+    /// Dispose 方法
+    /// </summary>
+    public void Dispose()
+    {
+        Log($"{nameof(TaskServicesFactory)} Disposed");
+        _shutdownCts?.Dispose();
     }
 }

@@ -4,16 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Longbow.Tasks
+namespace Longbow.Tasks;
+
+internal class NoneStorage : IStorage
 {
-    internal class NoneStorage : IStorage
-    {
-        public Exception? Exception { get; }
+    public Exception? Exception { get; }
 
-        public Task LoadAsync() => Task.CompletedTask;
+    public Task LoadAsync() => Task.CompletedTask;
 
-        public bool Remove(IEnumerable<string> schedulerNames) => true;
+    public bool Remove(IEnumerable<string> schedulerNames) => true;
 
-        public bool Save(string schedulerName, ITrigger trigger) => true;
-    }
+    public bool Save(string schedulerName, ITrigger trigger) => true;
 }

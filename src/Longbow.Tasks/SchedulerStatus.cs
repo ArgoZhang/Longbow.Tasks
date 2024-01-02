@@ -1,25 +1,24 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
-namespace Longbow.Tasks
+namespace Longbow.Tasks;
+
+/// <summary>
+/// 调度器枚举类型
+/// </summary>
+public enum SchedulerStatus
 {
     /// <summary>
-    /// 调度器枚举类型
+    /// 准备
     /// </summary>
-    public enum SchedulerStatus
-    {
-        /// <summary>
-        /// 准备
-        /// </summary>
-        Ready = 0,
+    Ready = 0,
 
-        /// <summary>
-        /// 运行中
-        /// </summary>
-        Running = 1,
+    /// <summary>
+    /// 运行中
+    /// </summary>
+    Running = 1,
 
-        /// <summary>
-        /// 被禁用
-        /// </summary>
-        Disabled = 2
-    }
+    /// <summary>
+    /// 被禁用
+    /// </summary>
+    Disabled = 2
 }

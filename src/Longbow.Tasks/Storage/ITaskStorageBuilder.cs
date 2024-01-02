@@ -2,16 +2,15 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Longbow.Tasks
+namespace Longbow.Tasks;
+
+/// <summary>
+/// TaskSericesBuilder 扩展任务持久化接口
+/// </summary>
+public interface ITaskStorageBuilder
 {
     /// <summary>
-    /// TaskSericesBuilder 扩展任务持久化接口
+    /// 获取 容器服务集合
     /// </summary>
-    public interface ITaskStorageBuilder
-    {
-        /// <summary>
-        /// 获取 容器服务集合
-        /// </summary>
-        IServiceCollection Services { get; }
-    }
+    IServiceCollection Services { get; }
 }
