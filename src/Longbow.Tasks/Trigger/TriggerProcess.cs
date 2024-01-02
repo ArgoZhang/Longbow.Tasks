@@ -10,7 +10,10 @@ namespace Longbow.Tasks
     /// <summary>
     /// Trigger 触发器进程类 负责维护触发器的运行
     /// </summary>
-    internal class TriggerProcess
+    /// <remarks>
+    /// 构造函数
+    /// </remarks>
+    internal class TriggerProcess(string name, Action<string> loggerAction, ITrigger trigger, IStorage storage, Func<CancellationToken, Task> doWork)
     {
         /// <summary>
         /// 触发器取消令牌 此令牌单独设置触发器是否工作
@@ -30,39 +33,27 @@ namespace Longbow.Tasks
         /// <summary>
         /// 获得 任务调度名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; } = name;
 
         /// <summary>
         /// 获得/设置 触发器实例
         /// </summary>
-        public ITrigger Trigger { get; set; }
+        public ITrigger Trigger { get; } = trigger;
 
         /// <summary>
         /// 执行任务方法
         /// </summary>
-        public Func<CancellationToken, Task> DoWork { get; set; }
+        public Func<CancellationToken, Task> DoWork { get; } = doWork;
 
         /// <summary>
         /// 获得/设置 日志委托
         /// </summary>
-        public Action<string> LoggerAction { get; set; }
+        public Action<string> LoggerAction { get; } = loggerAction;
 
         /// <summary>
         /// 获得/设置 触发器持久化 IStorage 实例
         /// </summary>
-        public IStorage Storage { get; set; }
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public TriggerProcess(string name, Action<string> loggerAction, ITrigger trigger, IStorage storage, Func<CancellationToken, Task> dowork)
-        {
-            Name = name;
-            LoggerAction = loggerAction;
-            Trigger = trigger;
-            Storage = storage;
-            DoWork = dowork;
-        }
+        public IStorage Storage { get; } = storage;
 
         /// <summary>
         /// 触发器处理器开始工作

@@ -46,16 +46,11 @@ namespace Longbow.Tasks
     /// 缓存配置类
     /// </summary>
     /// <typeparam name="TOptions"></typeparam>
-    internal class FileStorageOptionsConfigureOptions<TOptions> : ConfigureFromConfigurationOptions<TOptions> where TOptions : class
+    /// <remarks>
+    /// 构造函数
+    /// </remarks>
+    /// <param name="configuration"></param>
+    internal class FileStorageOptionsConfigureOptions<TOptions>(IConfiguration configuration) : ConfigureFromConfigurationOptions<TOptions>(configuration.GetSection("FileStorageOptions")) where TOptions : class
     {
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="configuration"></param>
-        public FileStorageOptionsConfigureOptions(IConfiguration configuration)
-            : base(configuration.GetSection("FileStorageOptions"))
-        {
-
-        }
     }
 }
