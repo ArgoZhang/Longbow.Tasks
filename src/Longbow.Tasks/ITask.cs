@@ -16,7 +16,7 @@ namespace Longbow.Tasks
         /// </summary>
         /// <param name="cancellationToken">CancellationToken 实例</param>
         [Obsolete("已过期，请使用 IServiceProvider 重载方法")]
-        Task Execute(CancellationToken cancellationToken);
+        Task Execute(CancellationToken cancellationToken) => Task.CompletedTask;
 
         /// <summary>
         /// 任务执行操作方法
