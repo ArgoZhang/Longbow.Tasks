@@ -66,6 +66,12 @@ public class ScheduleTaskTest
     }
 
     [Fact]
+    public void WithCustom_Ok()
+    {
+        var trigger = TriggerBuilder.Default.WithCustom(() => DateTimeOffset.Now.AddSeconds(10)).Build();
+    }
+
+    [Fact]
     public void Trigger_ToString()
     {
         Assert.Equal("Run once trigger", TriggerBuilder.Default.Build().ToString());
