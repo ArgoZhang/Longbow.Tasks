@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Longbow.Tasks;
@@ -24,7 +25,14 @@ public interface ITrigger
     /// <summary>
     /// 触发器状态改变回调方法
     /// </summary>
+    [Obsolete("已过期，单词拼写错误请使用 EnabledChanged")]
+    [ExcludeFromCodeCoverage]
     Action<bool>? EnabeldChanged { get; set; }
+
+    /// <summary>
+    /// 触发器状态改变回调方法
+    /// </summary>
+    Action<bool>? EnabledChanged { get; set; }
 
     /// <summary>
     /// 获得 任务开始时间
