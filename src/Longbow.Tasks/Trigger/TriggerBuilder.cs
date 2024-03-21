@@ -14,6 +14,7 @@ public class TriggerBuilder
     private int _repeatCount;
     private DateTimeOffset? _startTime;
     private TimeSpan _timeout = Timeout.InfiniteTimeSpan;
+    private Func<DateTimeOffset>? _nextRunTime;
     private string _name = "";
 
     /// <summary>
@@ -87,6 +88,12 @@ public class TriggerBuilder
         return this;
     }
 
+    public TriggerBuilder WithCustom(Func<DateTimeOffset> nextRunTime)
+    {
+        _nextRunTime = nextRunTime;
+        return this;
+    }
+
     /// <summary>
     /// 设置任务触发器名称
     /// </summary>
@@ -118,6 +125,14 @@ public class TriggerBuilder
                 NextRuntime = _startTime.HasValue ? _startTime.Value.Add(_interval) : DateTimeOffset.Now.Add(_interval)
             };
         }
+        else if (_nextRunTime != null)
+        {
+            tri = new CustomTrigger(_nextRunTime)
+            {
+                Name = _name ?? Guid.NewGuid().ToString(),
+                NextRuntime = _nextRunTime()
+            };
+        }
         else
         {
             tri = new DefaultTrigger()
@@ -127,6 +142,7 @@ public class TriggerBuilder
                 Timeout = _timeout
             };
         }
+
         return tri;
     }
 
