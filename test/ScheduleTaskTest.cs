@@ -109,7 +109,7 @@ public class ScheduleTaskTest
     {
         public string Name { get; set; }
         public bool Enabled { get; set; }
-        public Action<bool> EnabeldChanged { get; set; }
+        public Action<bool> EnabledChanged { get; set; }
         public DateTimeOffset? NextRuntime { get; set; }
         public TimeSpan LastRunElapsedTime { get; set; }
         public TriggerResult LastResult { get; set; }

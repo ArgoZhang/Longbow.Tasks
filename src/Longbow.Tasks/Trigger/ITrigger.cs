@@ -27,7 +27,7 @@ public interface ITrigger
     /// </summary>
     [Obsolete("已过期，单词拼写错误请使用 EnabledChanged")]
     [ExcludeFromCodeCoverage]
-    Action<bool>? EnabeldChanged { get; set; }
+    Action<bool>? EnabeldChanged { get => EnabledChanged; set => EnabledChanged = value; }
 
     /// <summary>
     /// 触发器状态改变回调方法
