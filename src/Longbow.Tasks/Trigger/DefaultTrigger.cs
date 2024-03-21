@@ -40,12 +40,8 @@ internal class DefaultTrigger : ITrigger
     public string Name { get; set; } = "";
 
     /// <summary>
-    /// 
+    /// 获得/设置 Enabled 改变回调方法
     /// </summary>
-    [Obsolete("已过期，单词拼写错误请使用 EnabledChanged")]
-    [ExcludeFromCodeCoverage]
-    public Action<bool>? EnabeldChanged { get => EnabledChanged; set => EnabledChanged = value; }
-
     public Action<bool>? EnabledChanged { get; set; }
 
     /// <summary>
