@@ -63,12 +63,14 @@ public class ScheduleTaskTest
     {
         var trigger = TriggerBuilder.Default.WithInterval().Build();
         trigger = TriggerBuilder.Default.WithInterval(1000).Build();
+        Assert.Equal("RecurringTrigger", trigger.GetType().Name);
     }
 
     [Fact]
     public void WithCustom_Ok()
     {
         var trigger = TriggerBuilder.Default.WithCustom(() => DateTimeOffset.Now.AddSeconds(10)).Build();
+        Assert.Equal("CustomTrigger", trigger.GetType().Name);
     }
 
     [Fact]
