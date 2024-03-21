@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Longbow.Tasks;
 
-internal class CustomTrigger: DefaultTrigger
+internal class CustomTrigger : DefaultTrigger
 {
     private readonly Func<DateTimeOffset> _nextRunTime;
 

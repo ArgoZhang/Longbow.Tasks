@@ -136,7 +136,7 @@ internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logge
         Triggers.Add(triggerProcess);
 
         // 注册触发器状态改变回调方法
-        trigger.EnabeldChanged = enabled =>
+        trigger.EnabledChanged = enabled =>
         {
             LoggerAction($"{nameof(TriggerProcess)} Trigger({trigger.GetType().Name}) Enabled({enabled})");
             if (!enabled)

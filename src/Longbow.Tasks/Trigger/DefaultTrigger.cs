@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Longbow.Tasks;
@@ -28,7 +29,7 @@ internal class DefaultTrigger : ITrigger
                     NextRuntime = null;
                     LastResult = TriggerResult.Cancelled;
                 }
-                EnabeldChanged?.Invoke(value);
+                EnabledChanged?.Invoke(value);
             }
         }
     }
@@ -41,7 +42,11 @@ internal class DefaultTrigger : ITrigger
     /// <summary>
     /// 
     /// </summary>
-    public Action<bool>? EnabeldChanged { get; set; }
+    [Obsolete("已过期，单词拼写错误请使用 EnabledChanged")]
+    [ExcludeFromCodeCoverage]
+    public Action<bool>? EnabeldChanged { get => EnabledChanged; set => EnabledChanged = value; }
+
+    public Action<bool>? EnabledChanged { get; set; }
 
     /// <summary>
     /// 获得 上次任务执行时间
