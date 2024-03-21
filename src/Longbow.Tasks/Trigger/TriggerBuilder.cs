@@ -142,7 +142,6 @@ public class TriggerBuilder
                 Timeout = _timeout
             };
         }
-
         return tri;
     }
 
