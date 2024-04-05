@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Longbow.Tasks;
@@ -86,12 +85,13 @@ internal class DefaultTrigger : ITrigger
     /// <returns>返回真时表示执行任务</returns>
     public virtual bool Pulse(CancellationToken cancellationToken = default)
     {
+        var ret = false;
         if (LastRuntime == null)
         {
             LastRuntime = DateTimeOffset.Now;
-            return true;
+            ret = true;
         }
-        return false;
+        return ret;
     }
 
     /// <summary>

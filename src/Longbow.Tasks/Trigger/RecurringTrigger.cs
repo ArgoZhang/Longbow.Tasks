@@ -40,7 +40,7 @@ internal class RecurringTrigger : DefaultTrigger
             {
                 LastRuntime = DateTimeOffset.Now;
                 if (RepeatCount > 0) CurrentCount++;
-                NextRuntime = RepeatCount == 0 || CurrentCount < RepeatCount ? DateTimeOffset.Now.Add(Interval) : (DateTimeOffset?)null;
+                NextRuntime = RepeatCount == 0 || CurrentCount < RepeatCount ? DateTimeOffset.Now.Add(Interval) : null;
                 ret = true;
             }
         }

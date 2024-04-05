@@ -116,6 +116,7 @@ internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logge
                 var taskToken = CancellationTokenSource.CreateLinkedTokenSource(token, taskCancelTokenSource.Token);
                 if (!taskToken.IsCancellationRequested && TaskContext != null)
                 {
+                    trigger.LastResult = TriggerResult.Running;
                     await TaskContext.Execute(taskToken.Token).ConfigureAwait(false);
                     trigger.LastResult = TriggerResult.Success;
                 }

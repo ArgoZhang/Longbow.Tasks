@@ -2,14 +2,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Longbow.Tasks;
 
 /// <summary>
 /// 内部默认任务调度类
 /// </summary>
-internal class DefaultScheduler : IScheduler
+/// <param name="name"></param>
+internal class DefaultScheduler(string name) : IScheduler
 {
     /// <summary>
     /// 获得/设置 下一次运行时间 为空时表示不再运行
@@ -34,16 +39,17 @@ internal class DefaultScheduler : IScheduler
     /// <summary>
     /// 获得/设置 任务调度名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = name;
 
     /// <summary>
     /// 获得/设置 调度器相关触发器
     /// </summary>
-    public IEnumerable<ITrigger> Triggers => SchedulerProcess?.Triggers.Select(t => t.Trigger) ?? Array.Empty<DefaultTrigger>();
+    public IEnumerable<ITrigger> Triggers => SchedulerProcess.Triggers.Select(t => t.Trigger);
 
     /// <summary>
     /// 获得/设置 调度处理器实例
     /// </summary>
+    [NotNull]
     public SchedulerProcess? SchedulerProcess { get; set; }
 
     /// <summary>
@@ -56,10 +62,10 @@ internal class DefaultScheduler : IScheduler
     /// </summary>
     public SchedulerStatus Status
     {
-        get => SchedulerProcess?.Status ?? SchedulerStatus.Disabled;
+        get => SchedulerProcess.Status;
         set
         {
-            if (SchedulerProcess != null && SchedulerProcess.Status != value)
+            if (SchedulerProcess.Status != value)
             {
                 SchedulerProcess.Status = value;
                 SchedulerProcess.LoggerAction($"{nameof(Tasks.SchedulerProcess)} SchedulerStatus({value})");
@@ -83,8 +89,42 @@ internal class DefaultScheduler : IScheduler
     public Exception? Exception { get; set; }
 
     /// <summary>
-    /// 构造函数
+    /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
-    public DefaultScheduler(string name) => Name = name;
+    public async Task Run()
+    {
+        var context = SchedulerProcess.TaskContext;
+        if (context != null)
+        {
+            SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method");
+            var trigger = Triggers.FirstOrDefault();
+            if (trigger != null)
+            {
+                try
+                {
+                    var taskCancelTokenSource = new CancellationTokenSource(trigger.Timeout);
+                    trigger.LastResult = TriggerResult.Running;
+
+                    var sw = Stopwatch.StartNew();
+                    await context.Execute(taskCancelTokenSource.Token);
+                    sw.Stop();
+
+                    trigger.LastResult = TriggerResult.Success;
+                    SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method finished Elapsed: {sw.Elapsed}");
+                }
+                catch (TaskCanceledException)
+                {
+                    trigger.LastResult = TriggerResult.Timeout;
+                    SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method timeout");
+                }
+                catch (Exception ex)
+                {
+                    Exception = ex;
+                    trigger.LastResult = TriggerResult.Error;
+                    SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method exception");
+                    SchedulerProcess.LoggerAction(ex.FormatException());
+                }
+            }
+        }
+    }
 }

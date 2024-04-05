@@ -25,5 +25,10 @@ public enum TriggerResult
     /// <summary>
     /// 故障
     /// </summary>
-    Error = 3
+    Error = 3,
+
+    /// <summary>
+    /// 正在运行
+    /// </summary>
+    Running = 4
 }
