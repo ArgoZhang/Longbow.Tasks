@@ -100,13 +100,15 @@ internal class DefaultScheduler(string name) : IScheduler
             var trigger = Triggers.FirstOrDefault();
             if (trigger != null)
             {
-                var taskCancelTokenSource = new CancellationTokenSource(trigger.Timeout);
-                trigger.LastResult = TriggerResult.Running;
                 try
                 {
+                    var taskCancelTokenSource = new CancellationTokenSource(trigger.Timeout);
+                    trigger.LastResult = TriggerResult.Running;
+
                     var sw = Stopwatch.StartNew();
                     await context.Execute(taskCancelTokenSource.Token);
                     sw.Stop();
+
                     trigger.LastResult = TriggerResult.Success;
                     SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method finished Elapsed: {sw.Elapsed}");
                 }
@@ -120,6 +122,7 @@ internal class DefaultScheduler(string name) : IScheduler
                     Exception = ex;
                     trigger.LastResult = TriggerResult.Error;
                     SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method exception");
+                    SchedulerProcess.LoggerAction(ex.FormatException());
                 }
             }
         }
