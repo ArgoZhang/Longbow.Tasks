@@ -95,14 +95,6 @@ internal class DefaultTrigger : ITrigger
     }
 
     /// <summary>
-    /// 立即运行任务方法
-    /// </summary>
-    public virtual void Run()
-    {
-        LastRuntime = null;
-    }
-
-    /// <summary>
     /// 重载 ToString 方法 返回 Run once trigger
     /// </summary>
     /// <returns></returns>

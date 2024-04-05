@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Longbow.Tasks;
 
@@ -58,5 +59,5 @@ public interface IScheduler
     /// <summary>
     /// 立即执行任务方法
     /// </summary>
-    void Run();
+    Task Run();
 }

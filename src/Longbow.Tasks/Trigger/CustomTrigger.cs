@@ -31,14 +31,6 @@ internal class CustomTrigger : DefaultTrigger
         return false;
     }
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public override void Run()
-    {
-        base.Run();
-    }
-
     public override string ToString()
     {
         return "Custom Trigger";

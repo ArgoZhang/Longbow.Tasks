@@ -88,9 +88,4 @@ public interface ITrigger
     /// </summary>
     /// <param name="datas"></param>
     void LoadData(Dictionary<string, object> datas);
-
-    /// <summary>
-    /// 手动立即运行方法
-    /// </summary>
-    void Run();
 }

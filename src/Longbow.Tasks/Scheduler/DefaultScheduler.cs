@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Longbow.Tasks;
 
@@ -88,13 +90,12 @@ internal class DefaultScheduler(string name) : IScheduler
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public void Run()
+    public async Task Run()
     {
-        if (Triggers.FirstOrDefault() is DefaultTrigger trigger)
+        var context = SchedulerProcess.TaskContext;
+        if (context != null)
         {
-            SchedulerProcess.Stop();
-            trigger.Run();
-            SchedulerProcess.Start();
+            await context.Execute(CancellationToken.None);
         }
     }
 }
