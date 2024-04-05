@@ -98,33 +98,30 @@ internal class DefaultScheduler(string name) : IScheduler
         {
             SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method");
             var trigger = Triggers.FirstOrDefault();
-            if (trigger == null)
+            if (trigger != null)
             {
-                SchedulerProcess.LoggerAction($"None trigger");
-                return;
+                var taskCancelTokenSource = new CancellationTokenSource(trigger.Timeout);
+                trigger.LastResult = TriggerResult.Running;
+                try
+                {
+                    var sw = Stopwatch.StartNew();
+                    await context.Execute(taskCancelTokenSource.Token);
+                    sw.Stop();
+                    trigger.LastResult = TriggerResult.Success;
+                    SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method finished Elapsed: {sw.Elapsed}");
+                }
+                catch (TaskCanceledException)
+                {
+                    trigger.LastResult = TriggerResult.Timeout;
+                    SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method timeout");
+                }
+                catch (Exception ex)
+                {
+                    Exception = ex;
+                    trigger.LastResult = TriggerResult.Error;
+                    SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method exception");
+                }
             }
-
-            var taskCancelTokenSource = new CancellationTokenSource(trigger.Timeout);
-            trigger.LastResult = TriggerResult.Running;
-
-            try
-            {
-                var sw = Stopwatch.StartNew();
-                await context.Execute(taskCancelTokenSource.Token);
-                sw.Stop();
-                SchedulerProcess.LoggerAction(
-                    $"{GetType().Name}: {Name} call Run method finished Elapsed: {sw.Elapsed}");
-                trigger.LastResult = TriggerResult.Success;
-            }
-            catch (TaskCanceledException)
-            {
-                trigger.LastResult = TriggerResult.Timeout;
-            }
-            catch (Exception e)
-            {
-                trigger.LastResult = TriggerResult.Error;
-            }
-
         }
     }
 }
