@@ -9,7 +9,7 @@ namespace Longbow.Tasks.Test;
 public class TrigerTest
 {
     [Fact]
-    public void Run_Ok()
+    public async Task DefaultTrigger_Run()
     {
         TaskServicesManager.Init();
 
@@ -23,8 +23,46 @@ public class TrigerTest
         });
         autoReset.WaitOne();
 
-        scheduler1.Run();
+        await scheduler1.Run();
         autoReset.WaitOne();
         Assert.Equal(2, count);
+    }
+
+    [Fact]
+    public void RecurringTrigger_Run()
+    {
+        TaskServicesManager.Init();
+
+        var autoReset = new AutoResetEvent(false);
+        var count = 0;
+        var scheduler1 = TaskServicesManager.GetOrAdd("test-run", (provider, token) =>
+        {
+            count++;
+            autoReset.Set();
+            return Task.CompletedTask;
+        }, TriggerBuilder.Default.WithInterval(5000).Build());
+
+        scheduler1.Run();
+        autoReset.WaitOne();
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public void CronTrigger_Run()
+    {
+        TaskServicesManager.Init();
+
+        var autoReset = new AutoResetEvent(false);
+        var count = 0;
+        var scheduler1 = TaskServicesManager.GetOrAdd("test-run", (provider, token) =>
+        {
+            count++;
+            autoReset.Set();
+            return Task.CompletedTask;
+        }, TriggerBuilder.Build("10 * * * * *"));
+
+        scheduler1.Run();
+        autoReset.WaitOne();
+        Assert.Equal(1, count);
     }
 }
