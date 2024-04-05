@@ -123,10 +123,5 @@ public class ScheduleTaskTest
         public bool Pulse(CancellationToken cancellationToken = default) => true;
 
         public Dictionary<string, object> SetData() => new Dictionary<string, object>();
-
-        public void Run()
-        {
-
-        }
     }
 }
