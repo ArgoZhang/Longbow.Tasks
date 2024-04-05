@@ -9,7 +9,8 @@ namespace Longbow.Tasks;
 /// <summary>
 /// 内部默认任务调度类
 /// </summary>
-internal class DefaultScheduler : IScheduler
+/// <param name="name"></param>
+internal class DefaultScheduler(string name) : IScheduler
 {
     /// <summary>
     /// 获得/设置 下一次运行时间 为空时表示不再运行
@@ -34,12 +35,12 @@ internal class DefaultScheduler : IScheduler
     /// <summary>
     /// 获得/设置 任务调度名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = name;
 
     /// <summary>
     /// 获得/设置 调度器相关触发器
     /// </summary>
-    public IEnumerable<ITrigger> Triggers => SchedulerProcess?.Triggers.Select(t => t.Trigger) ?? Array.Empty<DefaultTrigger>();
+    public IEnumerable<ITrigger> Triggers => SchedulerProcess?.Triggers.Select(t => t.Trigger) ?? [];
 
     /// <summary>
     /// 获得/设置 调度处理器实例
@@ -83,8 +84,13 @@ internal class DefaultScheduler : IScheduler
     public Exception? Exception { get; set; }
 
     /// <summary>
-    /// 构造函数
+    /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
-    public DefaultScheduler(string name) => Name = name;
+    public void Run()
+    {
+        foreach (var trigger in Triggers)
+        {
+            trigger.Run();
+        }
+    }
 }
