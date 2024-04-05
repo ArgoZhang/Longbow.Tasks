@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,7 @@ sealed class TaskServicesFactory : IDisposable, IHostedService
 
     public IServiceProvider ServiceProvider { get; }
 
+    [NotNull]
     internal static TaskServicesFactory? Instance { get; set; }
 
     /// <summary>
