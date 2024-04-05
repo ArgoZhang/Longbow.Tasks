@@ -53,6 +53,14 @@ internal class CronTrigger : DefaultTrigger
     }
 
     /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override void Run()
+    {
+
+    }
+
+    /// <summary>
     /// 设置序列化属性集合方法
     /// </summary>
     /// <returns></returns>

@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Longbow.Tasks;
@@ -79,6 +78,8 @@ internal class DefaultTrigger : ITrigger
     /// </summary>
     public TimeSpan Timeout { get; set; }
 
+    private bool _runState;
+
     /// <summary>
     /// 触发器 心跳 返回 true 时触发任务执行 同步阻塞线程方法 内部阻塞到 ITrigger 的下一次运行时间
     /// </summary>
@@ -89,9 +90,18 @@ internal class DefaultTrigger : ITrigger
         if (LastRuntime == null)
         {
             LastRuntime = DateTimeOffset.Now;
-            return true;
+            _runState = true;
         }
-        return false;
+        else
+        {
+            _runState = false;
+        }
+        return _runState;
+    }
+
+    public virtual void Run()
+    {
+        LastRuntime = null;
     }
 
     /// <summary>
