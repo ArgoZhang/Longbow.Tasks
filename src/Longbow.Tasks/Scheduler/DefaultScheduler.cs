@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -95,7 +96,11 @@ internal class DefaultScheduler(string name) : IScheduler
         var context = SchedulerProcess.TaskContext;
         if (context != null)
         {
+            SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method");
+            var sw = Stopwatch.StartNew();
             await context.Execute(CancellationToken.None);
+            sw.Stop();
+            SchedulerProcess.LoggerAction($"{GetType().Name}: {Name} call Run method finished Elapsed: {sw.Elapsed}");
         }
     }
 }
