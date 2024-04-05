@@ -78,8 +78,6 @@ internal class DefaultTrigger : ITrigger
     /// </summary>
     public TimeSpan Timeout { get; set; }
 
-    private bool _runState;
-
     /// <summary>
     /// 触发器 心跳 返回 true 时触发任务执行 同步阻塞线程方法 内部阻塞到 ITrigger 的下一次运行时间
     /// </summary>
@@ -87,18 +85,18 @@ internal class DefaultTrigger : ITrigger
     /// <returns>返回真时表示执行任务</returns>
     public virtual bool Pulse(CancellationToken cancellationToken = default)
     {
+        var ret = false;
         if (LastRuntime == null)
         {
             LastRuntime = DateTimeOffset.Now;
-            _runState = true;
+            ret = true;
         }
-        else
-        {
-            _runState = false;
-        }
-        return _runState;
+        return ret;
     }
 
+    /// <summary>
+    /// 立即运行任务方法
+    /// </summary>
     public virtual void Run()
     {
         LastRuntime = null;

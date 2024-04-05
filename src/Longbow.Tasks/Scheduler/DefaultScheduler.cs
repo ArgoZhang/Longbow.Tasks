@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Longbow.Tasks;
@@ -40,11 +41,12 @@ internal class DefaultScheduler(string name) : IScheduler
     /// <summary>
     /// 获得/设置 调度器相关触发器
     /// </summary>
-    public IEnumerable<ITrigger> Triggers => SchedulerProcess?.Triggers.Select(t => t.Trigger) ?? [];
+    public IEnumerable<ITrigger> Triggers => SchedulerProcess.Triggers.Select(t => t.Trigger);
 
     /// <summary>
     /// 获得/设置 调度处理器实例
     /// </summary>
+    [NotNull]
     public SchedulerProcess? SchedulerProcess { get; set; }
 
     /// <summary>
@@ -57,10 +59,10 @@ internal class DefaultScheduler(string name) : IScheduler
     /// </summary>
     public SchedulerStatus Status
     {
-        get => SchedulerProcess?.Status ?? SchedulerStatus.Disabled;
+        get => SchedulerProcess.Status;
         set
         {
-            if (SchedulerProcess != null && SchedulerProcess.Status != value)
+            if (SchedulerProcess.Status != value)
             {
                 SchedulerProcess.Status = value;
                 SchedulerProcess.LoggerAction($"{nameof(Tasks.SchedulerProcess)} SchedulerStatus({value})");
@@ -88,9 +90,11 @@ internal class DefaultScheduler(string name) : IScheduler
     /// </summary>
     public void Run()
     {
-        foreach (var trigger in Triggers)
+        if (Triggers.FirstOrDefault() is DefaultTrigger trigger)
         {
+            SchedulerProcess.Stop();
             trigger.Run();
+            SchedulerProcess.Start();
         }
     }
 }
