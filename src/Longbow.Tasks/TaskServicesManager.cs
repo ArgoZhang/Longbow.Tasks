@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -121,7 +119,7 @@ public static class TaskServicesManager
     /// <param name="schedulerName">任务名称</param>
     public static bool Remove(string schedulerName)
     {
-        Factory?.Storage.Remove(new string[] { schedulerName });
+        Factory?.Storage.Remove([schedulerName]);
         var ret = _schedulerPool.TryRemove(schedulerName, out var scheduler);
         if (ret && scheduler != null)
         {
