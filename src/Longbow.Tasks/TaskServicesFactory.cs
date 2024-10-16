@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+﻿// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

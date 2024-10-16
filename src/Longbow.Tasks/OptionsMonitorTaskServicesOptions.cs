@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+﻿// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using Microsoft.Extensions.Options;
 using System;
@@ -14,10 +14,7 @@ class OptionsMonitorTaskServicesOptions : IOptionsMonitor<TaskServicesOptions>
 
     public TaskServicesOptions CurrentValue { get; }
 
-#if NET6_0
-    public TaskServicesOptions Get(string name) => CurrentValue;
-#else
     public TaskServicesOptions Get(string? name) => CurrentValue;
-#endif
+
     public IDisposable OnChange(Action<TaskServicesOptions, string> listener) => null!;
 }

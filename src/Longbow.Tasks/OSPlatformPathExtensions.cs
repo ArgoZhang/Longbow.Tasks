@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+﻿// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 #if !NET45
 using System.IO;
