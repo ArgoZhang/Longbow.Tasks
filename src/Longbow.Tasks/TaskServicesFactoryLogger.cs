@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+﻿// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using Longbow.Logging;
 using Microsoft.Extensions.Logging;
@@ -15,11 +15,7 @@ class TaskServicesFactoryLogger : ILogger<TaskServicesFactory>
         _logger = new FileLoggerProvider(new FileLoggerOptions()).CreateLogger(nameof(TaskServicesFactory));
     }
 
-#if NET6_0
-    public IDisposable BeginScope<TState>(TState state) => _logger.BeginScope<TState>(state);
-#else
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => _logger.BeginScope<TState>(state);
-#endif
 
     public bool IsEnabled(LogLevel logLevel) => _logger.IsEnabled(logLevel);
 
