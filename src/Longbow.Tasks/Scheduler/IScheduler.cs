@@ -57,6 +57,11 @@ public interface IScheduler
     ITask? Task { get; }
 
     /// <summary>
+    /// 获得/设置 任务当前状态
+    /// </summary>
+    TaskStatus TaskStatus { get; }
+
+    /// <summary>
     /// 立即执行任务方法
     /// </summary>
     Task Run();

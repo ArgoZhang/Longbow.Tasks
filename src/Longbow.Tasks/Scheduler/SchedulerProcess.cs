@@ -19,22 +19,15 @@ namespace Longbow.Tasks;
 /// <param name="storage">IStorage 实例</param>
 internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logger, IStorage storage)
 {
-    private readonly DefaultScheduler _scheduler = scheduler;
-
     /// <summary>
     /// 获得/设置 任务调度状态
     /// </summary>
     public SchedulerStatus Status { get; set; }
 
     /// <summary>
-    /// 获得/设置 任务持久化实例
-    /// </summary>
-    public IStorage Storage { get; } = storage;
-
-    /// <summary>
     /// 获得/设置 任务调度实例
     /// </summary>
-    public IScheduler Scheduler { get => _scheduler; }
+    public IScheduler Scheduler { get => scheduler; }
 
     /// <summary>
     /// 获得/设置 调度任务
@@ -72,7 +65,7 @@ internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logge
         Task.Run(() =>
         {
             TaskContext = new DefaultTaskMetaData(new T());
-            _scheduler.Task = TaskContext.Task;
+            scheduler.Task = TaskContext.Task;
             _initToken.Cancel();
 
             // Stop 调用
@@ -94,8 +87,7 @@ internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logge
         _initToken.Cancel();
         var sw = Stopwatch.StartNew();
         TaskContext = new DefaultTaskMetaData(task);
-        _scheduler.Task = TaskContext.Task;
-        _scheduler.Task = task;
+        scheduler.Task = TaskContext.Task;
         InternalStart(trigger);
         sw.Stop();
         LoggerAction($"{nameof(SchedulerProcess)} Start(methodCall) success Called Elapsed: {sw.Elapsed}");
@@ -105,7 +97,7 @@ internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logge
     {
         var doWork = new Func<CancellationToken, Task>(async token =>
         {
-            _scheduler.Exception = null;
+            scheduler.Exception = null;
             // 设置任务超时取消令牌
             var taskCancelTokenSource = new CancellationTokenSource(trigger.Timeout);
             try
@@ -124,16 +116,16 @@ internal class SchedulerProcess(DefaultScheduler scheduler, Action<string> logge
             catch (TaskCanceledException) { }
             catch (Exception ex)
             {
-                _scheduler.Exception = ex;
+                scheduler.Exception = ex;
                 LoggerAction(ex.FormatException());
             }
 
             // 设置 Trigger 状态
             if (token.IsCancellationRequested) trigger.LastResult = TriggerResult.Cancelled;
             if (taskCancelTokenSource.IsCancellationRequested) trigger.LastResult = TriggerResult.Timeout;
-            if (_scheduler.Exception != null) trigger.LastResult = TriggerResult.Error;
+            if (scheduler.Exception != null) trigger.LastResult = TriggerResult.Error;
         });
-        var triggerProcess = new TriggerProcess(Scheduler.Name, LoggerAction, trigger, Storage, doWork);
+        var triggerProcess = new TriggerProcess(Scheduler.Name, LoggerAction, trigger, storage, doWork);
         Triggers.Add(triggerProcess);
 
         // 注册触发器状态改变回调方法

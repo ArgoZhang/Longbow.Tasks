@@ -14,6 +14,11 @@ class DefaultTaskMetaData(ITask task)
     public ITask Task { get; } = task;
 
     /// <summary>
+    /// 
+    /// </summary>
+    public TaskStatus Status { get; set; } = TaskStatus.Created;
+
+    /// <summary>
     /// 任务执行操作方法
     /// </summary>
     /// <param name="cancellationToken">CancellationToken 实例</param>
@@ -21,10 +26,17 @@ class DefaultTaskMetaData(ITask task)
     {
         try
         {
+            Status = TaskStatus.Running;
             await Task.Execute(TaskServicesFactory.Instance.ServiceProvider, cancellationToken);
+            Status = TaskStatus.RanToCompletion;
+        }
+        catch (OperationCanceledException)
+        {
+            Status = TaskStatus.Canceled;
         }
         catch
         {
+            Status = TaskStatus.Faulted;
             throw;
         }
         finally

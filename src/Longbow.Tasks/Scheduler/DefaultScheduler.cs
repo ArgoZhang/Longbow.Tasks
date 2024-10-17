@@ -91,6 +91,11 @@ internal class DefaultScheduler(string name) : IScheduler
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    public TaskStatus TaskStatus => SchedulerProcess.TaskContext?.Status ?? TaskStatus.WaitingForActivation;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public async Task Run()
     {
         var context = SchedulerProcess.TaskContext;
