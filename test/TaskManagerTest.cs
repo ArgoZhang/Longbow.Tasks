@@ -86,7 +86,7 @@ public class TaskManagerTest : IDisposable
     }
 
     [Fact]
-    public async void ExecutableTask()
+    public async Task ExecutableTask()
     {
         var schedule = TaskServicesManager.GetOrAdd<Foo2Task>();
         await Task.Delay(300);
@@ -383,7 +383,7 @@ public class TaskManagerTest : IDisposable
     }
 
     [Fact]
-    public async void Task_Timeout()
+    public async Task Task_Timeout()
     {
         var scheduler = TaskServicesManager.GetOrAdd("Recurring_Timeout", (provider, token) => Task.Delay(500, token), TriggerBuilder.Default.WithInterval(300).WithRepeatCount(2).WithTimeout(200).Build());
 
