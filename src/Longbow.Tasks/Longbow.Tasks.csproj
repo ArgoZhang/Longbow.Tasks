@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
-    <Version>8.2.0</Version>
+    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <Version>9.0.1</Version>
     <Copyright>Longbow</Copyright>
     <Description>Longbow Component for .net 6.0+</Description>
     <Authors>Argo Zhang(argo@163.com)</Authors>
@@ -22,12 +22,16 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.*" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.*" />
+  </ItemGroup>
+  
   <ItemGroup>
-    <PackageReference Include="Longbow.Cronos" Version="1.0.0" />
-    <PackageReference Include="Longbow.Logging" Version="8.1.0" />
+    <PackageReference Include="Longbow.Cronos" Version="9.*" />
+    <PackageReference Include="Longbow.Logging" Version="9.*" />
   </ItemGroup>
 
   <PropertyGroup>
