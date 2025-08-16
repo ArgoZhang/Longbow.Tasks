@@ -93,7 +93,7 @@ internal class TriggerProcess(string name, Action<string> loggerAction, ITrigger
                 // 持久化
                 Trigger.Save(Name, Storage, LoggerAction);
             }
-        });
+        }, CancellationToken.None);
     }
 
     /// <summary>
