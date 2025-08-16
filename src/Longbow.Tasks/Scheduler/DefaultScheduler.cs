@@ -111,7 +111,7 @@ internal class DefaultScheduler(string name) : IScheduler
                     trigger.LastResult = TriggerResult.Running;
 
                     var sw = Stopwatch.StartNew();
-                    await context.Execute(taskCancelTokenSource.Token);
+                    await context.Execute(taskCancelTokenSource.Token).ConfigureAwait(false);
                     sw.Stop();
 
                     trigger.LastResult = TriggerResult.Success;
