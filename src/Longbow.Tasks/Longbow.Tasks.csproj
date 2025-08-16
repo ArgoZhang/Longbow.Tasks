@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
-    <Version>9.0.1</Version>
+    <Version>9.0.2</Version>
     <Copyright>Longbow</Copyright>
     <Description>Longbow Component for .net 6.0+</Description>
     <Authors>Argo Zhang(argo@163.com)</Authors>

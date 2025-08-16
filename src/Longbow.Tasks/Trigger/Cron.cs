@@ -287,7 +287,7 @@ public static class Cron
     /// <returns></returns>
     public static CronExpression ParseCronExpression(this string cronExpression)
     {
-        var parts = cronExpression.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = cronExpression.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
         var format = CronFormat.Standard;
 
         if (parts.Length == 6)
