@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -37,9 +37,9 @@ public class ScheduleTaskTest
     [Fact]
     public void WithStartTime_Ok()
     {
-        var trigger = TriggerBuilder.Default.WithStartTime(DateTimeOffset.Now.AddMilliseconds(500)).Build();
-        var trigger1 = TriggerBuilder.Default.WithStartTime().Build();
-        Assert.Equal(DateTimeOffset.MinValue, trigger1.StartTime);
+        TriggerBuilder.Default.WithStartTime(DateTimeOffset.Now.AddMilliseconds(500)).Build();
+        var trigger = TriggerBuilder.Default.WithStartTime().Build();
+        Assert.Equal(DateTimeOffset.MinValue, trigger.StartTime);
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public class ScheduleTaskTest
     [Fact]
     public void WithInterval_Ok()
     {
-        var trigger = TriggerBuilder.Default.WithInterval().Build();
-        trigger = TriggerBuilder.Default.WithInterval(1000).Build();
+        TriggerBuilder.Default.WithInterval().Build();
+        var trigger = TriggerBuilder.Default.WithInterval(1000).Build();
         Assert.Equal("RecurringTrigger", trigger.GetType().Name);
     }
 
@@ -122,6 +122,6 @@ public class ScheduleTaskTest
 
         public bool Pulse(CancellationToken cancellationToken = default) => true;
 
-        public Dictionary<string, object> SetData() => new Dictionary<string, object>();
+        public Dictionary<string, object> SetData() => [];
     }
 }

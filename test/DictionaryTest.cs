@@ -1,9 +1,8 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -34,7 +33,7 @@ public class DictionaryTest(ITestOutputHelper helper)
         }));
 
         _helper.WriteLine($"Total Tasks: {tasks.Count()}");
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll([.. tasks]);
     }
 
     private async Task<string> GenerateValue(int i)
@@ -73,7 +72,7 @@ public class DictionaryTest(ITestOutputHelper helper)
         }));
 
         _helper.WriteLine($"Total Tasks: {tasks.Count()}");
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll([.. tasks]);
         _helper.WriteLine(pool["Test"].Value);
     }
 }

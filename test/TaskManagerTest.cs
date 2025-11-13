@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using System;
 using System.Diagnostics;
@@ -20,7 +20,7 @@ public class TaskManagerContext : ICollectionFixture<TestHost>
 public class TaskManagerTest : IDisposable
 {
     private static ITestOutputHelper _outputHelper;
-    private static int InitCount;
+    private static readonly int InitCount;
     private static int InstanceCount;
     private static int ExecuteCount;
     private CancellationTokenSource _executeToken;
@@ -64,6 +64,7 @@ public class TaskManagerTest : IDisposable
         var task2 = Task.Run(() => CreateTask());
         var task3 = Task.Run(() => CreateTask());
         Task.WaitAll(task1, task2, task3);
+
         Assert.Equal(1, InitCount);
         Assert.Equal(1, InstanceCount);
         Wait();

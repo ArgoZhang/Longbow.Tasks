@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Longbow.Tasks/Longbow.Tasks.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Longbow.Tasks.Test.csproj" />
+  </Folder>
+</Solution>
