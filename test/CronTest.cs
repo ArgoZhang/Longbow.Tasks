@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using Cronos;
 using System;
@@ -90,14 +90,14 @@ public class CronTest(ITestOutputHelper helper)
         var nextRuntimes = cron.GetOccurrences(now, now.AddMinutes(1), TimeZoneInfo.Local).Take(3).ToList();
         nextRuntimes.ForEach(d =>
         {
-            _helper.WriteLine($"{d.ToString()}");
+            _helper.WriteLine($"{d}");
         });
         Assert.Equal(nextRuntimes[0].AddSeconds(1), nextRuntimes[1]);
         Assert.Equal(nextRuntimes[1].AddSeconds(1), nextRuntimes[2]);
 
         // 每 2 秒
         cron = "*/2 * * * * *".ParseCronExpression();
-        nextRuntimes = cron.GetOccurrences(now, now.AddMinutes(1), TimeZoneInfo.Local).Take(3).ToList();
+        nextRuntimes = [.. cron.GetOccurrences(now, now.AddMinutes(1), TimeZoneInfo.Local).Take(3)];
         nextRuntimes.ForEach(d =>
         {
             _helper.WriteLine(d.ToString());
@@ -107,7 +107,7 @@ public class CronTest(ITestOutputHelper helper)
 
         // at 10 秒
         cron = "10 * * * * *".ParseCronExpression();
-        nextRuntimes = cron.GetOccurrences(now, now.AddMinutes(5), TimeZoneInfo.Local).Take(3).ToList();
+        nextRuntimes = [.. cron.GetOccurrences(now, now.AddMinutes(5), TimeZoneInfo.Local).Take(3)];
         nextRuntimes.ForEach(d =>
         {
             _helper.WriteLine(d.ToString());
@@ -117,7 +117,7 @@ public class CronTest(ITestOutputHelper helper)
 
         // range 10-15
         cron = "10-13 * * * * *".ParseCronExpression();
-        nextRuntimes = cron.GetOccurrences(now, now.AddMinutes(1), TimeZoneInfo.Local).Take(3).ToList();
+        nextRuntimes = [.. cron.GetOccurrences(now, now.AddMinutes(1), TimeZoneInfo.Local).Take(3)];
         nextRuntimes.ForEach(d =>
         {
             _helper.WriteLine(d.ToString());
@@ -127,7 +127,7 @@ public class CronTest(ITestOutputHelper helper)
     }
 
     [Fact]
-    public async void Second_Loop()
+    public async Task Second_Loop()
     {
         var cron = Cron.Secondly().ParseCronExpression();
         var count = 3;

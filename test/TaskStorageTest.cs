@@ -1,4 +1,4 @@
-﻿// Copyright (c) Argo Zhang (argo@163.com). All rights reserved.
+// Copyright (c) Argo Zhang (argo@live.ca). All rights reserved.
 
 using System;
 using System.IO;
@@ -94,7 +94,7 @@ public class TaskStorageTest
     }
 
     [Fact]
-    public async void DeleteStorageFile_Ok()
+    public async Task DeleteStorageFile_Ok()
     {
         var scheduler = TaskServicesManager.GetOrAdd("DeleteStorageFile", (provider, token) =>
         {
